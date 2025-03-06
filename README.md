@@ -13,6 +13,9 @@ If you want to test the CLI commands, follow the instructions below. If you are 
 
 ## Installation
 
+> [!Note]
+> The CLI is not published as npm package, so we are going to use it from the local repository
+
 Pre-requirements
 
 - Latest LTS version of Node.js
@@ -20,12 +23,17 @@ Pre-requirements
 Steps:
 
 1. Clone this repository
-2. Run `npm install` from the repo root
-3. Run `npm link` from the repo root
+2. From the repository root, run:
+
+   ```
+   npm install
+   npm run build
+   npm link
+   ```
 
 Now, you can run `optimizely-experimental` from everywhere.
 
-Test it by executing the command `optimizely-experimental` from any directory.
+Test it by executing the command `optimizely-experimental`. You should see something like this:
 
 ```
 $ optimizely-experimental
@@ -46,7 +54,7 @@ COMMANDS
 
 ### 1. Login to your SaaS instance
 
-1. Run `optimizely login` from anywhere and follow the instructions
+1. Run `optimizely-experimental login` from anywhere and follow the instructions
 
 ### 2. Create a configuration file with the help of the SDK
 
@@ -57,7 +65,13 @@ COMMANDS
    npm init -y
    ```
 
-3. Create a file called `optimizely.config.mjs` and put the following content:
+3. From the directory, run:
+
+   ```
+   npm link optimizely-sdk-experimental
+   ```
+
+4. Create a file called `optimizely.config.mjs` and put the following content:
 
    ```js
    // @ts-check
@@ -73,6 +87,6 @@ COMMANDS
    });
    ```
 
-4. Run the command `optimizely config push ./optimizely.config.mjs`
+5. Run the command `optimizely-experimental config push ./optimizely.config.mjs`
 
-5. Verify in your SaaS instance that you have a new content type called "SomeExperience"
+6. Verify in your SaaS instance that you have a new content type called "SomeExperience"
