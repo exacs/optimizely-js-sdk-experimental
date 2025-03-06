@@ -1,4 +1,6 @@
-# Management SDK experiment
+# Optimizely CMS JavaScript SDK
+
+**EXPERIMENTAL**. This repository is experimental and should not be used in production
 
 ## Goal
 
