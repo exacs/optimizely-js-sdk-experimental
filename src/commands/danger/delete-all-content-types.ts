@@ -1,11 +1,7 @@
 import { confirm } from "@inquirer/prompts";
-import { Args, Command, Flags } from "@oclif/core";
-import {
-  createRestApiClient,
-  createRestApiClientFromCredentials,
-} from "../../utils/restApiClient.js";
-import { readCredentials } from "../../utils/config.js";
+import { createRestApiClientFromCredentials } from "../../utils/restApiClient.js";
 import { BaseCommand } from "../../baseCommand.js";
+import ora from "ora";
 
 export default class DangerDeleteAllContentTypes extends BaseCommand<
   typeof DangerDeleteAllContentTypes
@@ -22,5 +18,48 @@ export default class DangerDeleteAllContentTypes extends BaseCommand<
     const answer = await confirm({
       message: "This will delete all your content types. Are you sure?",
     });
+
+    if (!answer) {
+      return;
+    }
+
+    const contentTypes = await client
+      .GET("/contenttypes")
+      .then((r) => r.data?.items);
+
+    const deletedTypes = contentTypes?.filter(
+      (t) => t.source !== "system" && t.source !== "serverModel"
+    );
+
+    if (!deletedTypes) {
+      return;
+    }
+
+    if (deletedTypes.length === 0) {
+      console.log("There are no content types in the CMS");
+      return;
+    }
+
+    console.log();
+    console.log("You will delete all these content types");
+    for (const type of deletedTypes) {
+      console.log(`- ${type.displayName} (${type.key})`);
+    }
+
+    const answer2 = await confirm({
+      message: "Are you sure?",
+    });
+
+    if (!answer2) {
+      return;
+    }
+
+    for (const type of deletedTypes) {
+      const spinner = ora(`Deleting ${type.key}...`);
+      await client.DELETE("/contenttypes/{key}", {
+        params: { path: { key: type.key } },
+      });
+      spinner.succeed(`'${type.key}' deleted`);
+    }
   }
 }
