@@ -1,7 +1,5 @@
-import type { components } from "./open-api/schema.js";
-
-type JsonConfig = components["schemas"]["Manifest"];
-type JsonContentType = components["schemas"]["ContentType"];
+import type { ContentType as JsonContentType } from "./utils/restApiSchema/manifest.js";
+import type { Manifest } from "./utils/restApiSchema/manifest.js";
 
 type JsConfig = {
   contentTypes?: {
@@ -14,8 +12,8 @@ type JsConfig = {
   };
 };
 
-export function buildConfig(jsConfig: JsConfig): JsonConfig {
-  const output: JsonConfig = {};
+export function buildConfig(jsConfig: JsConfig): Manifest {
+  const output: Manifest = {};
 
   if (jsConfig.contentTypes) {
     for (const key in jsConfig.contentTypes) {

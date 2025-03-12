@@ -1,9 +1,12 @@
+/** Re-Definition of the "Manifest", the JSON accepted in the endpoint POST /packages */
 export type Manifest = {
   contentTypes?: ContentType[];
 };
 
+/** Content Type */
 export interface ContentType {
   key: string;
+  displayName?: string;
   baseType:
     | "page"
     | "component"
@@ -44,7 +47,14 @@ export type ContentTypeProperty = {
   DateTime: {};
   Float: {};
   Integer: {};
-  String: {};
+  String: {
+    minLength?: number;
+    maxLength?: number;
+    enum?: {
+      // TODO: Check the enums here
+      values: { value: string; displayName: string }[];
+    };
+  };
   Url: {};
   JsonString: {};
   List: {};
