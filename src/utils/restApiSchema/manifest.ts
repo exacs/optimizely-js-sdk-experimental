@@ -21,9 +21,10 @@ export interface ContentType {
 }
 
 export type ContentTypeProperty = {
-  All: ContentTypeProperty["Boolean"] | ContentTypeProperty["Binary"];
+  All: ContentTypeProperty["String"];
   Base: {
-    format?: string;
+    // This should be different for each Content Type. In the spec is just "string" for all
+    // format?: string;
     displayName?: string;
     description?: string;
     required?: boolean;
@@ -47,7 +48,11 @@ export type ContentTypeProperty = {
   DateTime: {};
   Float: {};
   Integer: {};
-  String: {
+  String: ContentTypeProperty["Base"] & {
+    type: "string";
+
+    // Not available in the schema:
+    format?: "string" | "shortString" | "html";
     minLength?: number;
     maxLength?: number;
     enum?: {
