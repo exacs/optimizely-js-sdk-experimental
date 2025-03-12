@@ -7,6 +7,7 @@ import {
 } from "../../utils/restApiClient.js";
 import ora from "ora";
 import { BaseCommand } from "../../baseCommand.js";
+import { writeFile } from "node:fs/promises";
 
 export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
   static override args = {
@@ -14,6 +15,10 @@ export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
   };
   static override flags = {
     host: Flags.string({ description: "CMS instance URL" }),
+    output: Flags.string({ description: "if passed, write the manifest JSON" }),
+    dryRun: Flags.boolean({
+      description: "do not send anything to the server",
+    }),
   };
   static override description = "describe the command here";
   static override examples = ["<%= config.bin %> <%= command.id %>"];
@@ -23,6 +28,15 @@ export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
     const configPath = resolve(process.cwd(), args.file);
     const { default: jsonConfig } = await import(configPath);
     const restClient = await createRestApiClientFromCredentials(flags.host);
+
+    if (flags.output) {
+      await writeFile(flags.output, JSON.stringify(jsonConfig, null, 2));
+      console.log(`Configuration file written in '${flags.output}'`);
+    }
+
+    if (flags.dryRun) {
+      return;
+    }
 
     const spinner = ora("Uploading configuration file").start();
 
