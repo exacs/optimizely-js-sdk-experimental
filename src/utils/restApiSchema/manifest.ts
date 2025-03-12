@@ -1,7 +1,19 @@
-/** Definitions for ContentType, both the response from the server and the request to it */
+export type Manifest = {
+  contentTypes?: ContentType[];
+};
 
 export interface ContentType {
   key: string;
+  baseType:
+    | "page"
+    | "component"
+    | "media"
+    | "image"
+    | "video"
+    | "folder"
+    | "experience"
+    | "section"
+    | "element";
   properties?: Record<string, ContentTypeProperty["All"]>;
 }
 
