@@ -3,8 +3,9 @@ import { resolve } from "node:path";
 import { readCredentials } from "../../utils/config.js";
 import { createRestApiClient } from "../../utils/restApiClient.js";
 import ora from "ora";
+import { BaseCommand } from "../../baseCommand.js";
 
-export default class ConfigPush extends Command {
+export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
   static override args = {
     file: Args.string({ description: "configuration file", required: true }),
   };
@@ -16,22 +17,12 @@ export default class ConfigPush extends Command {
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ConfigPush);
-
     const cred = readCredentials(flags.host);
-
-    if (!cred) {
-      console.error("There are no credentials stored. Use the `login` command");
-      return;
-    }
 
     const configPath = resolve(process.cwd(), args.file);
     const { default: jsonConfig } = await import(configPath);
 
-    const restClient = await createRestApiClient(
-      cred.url,
-      cred.clientId,
-      cred.clientSecret
-    );
+    const restClient = await createRestApiClient(cred);
 
     const spinner = ora("Uploading configuration file").start();
 

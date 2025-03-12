@@ -1,5 +1,5 @@
 import createClient from "openapi-fetch/dist/index.js";
-import { paths } from "./restApiSchema.js";
+import { paths } from "./restApiSchema/openapi-auto-generated.js";
 
 export async function getToken(
   cmsRoot: string,
@@ -29,13 +29,17 @@ export async function getToken(
     });
 }
 
-export async function createRestApiClient(
-  cmsRoot: string,
-  clientId: string,
-  clientSecret: string
-) {
-  const baseUrl = new URL("/_cms/preview2", cmsRoot).toString();
-  const accessToken = await getToken(cmsRoot, clientId, clientSecret);
+export async function createRestApiClient({
+  url,
+  clientId,
+  clientSecret,
+}: {
+  url: string;
+  clientId: string;
+  clientSecret: string;
+}) {
+  const baseUrl = new URL("/_cms/preview2", url).toString();
+  const accessToken = await getToken(url, clientId, clientSecret);
 
   return createClient<paths>({
     baseUrl,
