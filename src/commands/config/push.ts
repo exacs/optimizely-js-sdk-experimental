@@ -1,7 +1,10 @@
 import { Args, Command, Flags } from "@oclif/core";
 import { resolve } from "node:path";
 import { readCredentials } from "../../utils/config.js";
-import { createRestApiClient } from "../../utils/restApiClient.js";
+import {
+  createRestApiClient,
+  createRestApiClientFromCredentials,
+} from "../../utils/restApiClient.js";
 import ora from "ora";
 import { BaseCommand } from "../../baseCommand.js";
 
@@ -17,12 +20,9 @@ export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ConfigPush);
-    const cred = readCredentials(flags.host);
-
     const configPath = resolve(process.cwd(), args.file);
     const { default: jsonConfig } = await import(configPath);
-
-    const restClient = await createRestApiClient(cred);
+    const restClient = await createRestApiClientFromCredentials(flags.host);
 
     const spinner = ora("Uploading configuration file").start();
 

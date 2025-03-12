@@ -1,5 +1,7 @@
 import createClient from "openapi-fetch/dist/index.js";
 import { paths } from "./restApiSchema/openapi-auto-generated.js";
+import { readCredentials } from "./config.js";
+import { credentialErrors } from "./error.js";
 
 export async function getToken(
   cmsRoot: string,
@@ -47,4 +49,15 @@ export async function createRestApiClient({
       authorization: `Bearer ${accessToken}`,
     },
   });
+}
+
+export async function createRestApiClientFromCredentials(host?: string) {
+  const cred = readCredentials(host);
+
+  if (!cred) {
+    throw new credentialErrors.NoCredentialsFound();
+  }
+
+  const client = await createRestApiClient(cred);
+  return client;
 }
