@@ -2,6 +2,7 @@
 
 import Conf from "conf";
 import { z } from "zod";
+import { CredentialsError } from "./error.js";
 
 const CmsSettingsSchema = z.record(
   z.string(),
@@ -50,7 +51,14 @@ export function readCredentials(url?: string) {
   const obj = CmsSettingsSchema.safeParse(conf.get("cms", {}));
 
   if (!obj.success) {
-    throw new Error("The configuration file has wrong format.");
+    throw new CredentialsError(
+      "wrong_format",
+      "The configuration file has wrong format."
+    );
+  }
+
+  if (Object.values(obj.data).length === 0) {
+    throw new CredentialsError("no_credentials_found");
   }
 
   // If the credentials has exactly one host, we can return it
@@ -61,8 +69,8 @@ export function readCredentials(url?: string) {
     };
   }
 
-  if (!url) {
-    throw new Error("Missing parameter `url`");
+  if (!url && Object.values(obj.data).length > 1) {
+    throw new CredentialsError("more_than_one_url");
   }
 
   const normalizedUrl = new URL("/", url).toString();
@@ -74,4 +82,6 @@ export function readCredentials(url?: string) {
       clientSecret: obj.data[normalizedUrl].clientSecret,
     };
   }
+
+  throw new Error();
 }
