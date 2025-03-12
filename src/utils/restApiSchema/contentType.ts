@@ -26,4 +26,14 @@ export type ContentTypeProperty = {
   Boolean: ContentTypeProperty["Base"] & {
     type: "boolean";
   };
+  Component: {};
+  Content: {};
+  ContentReference: {};
+  DateTime: {};
+  Float: {};
+  Integer: {};
+  String: {};
+  Url: {};
+  JsonString: {};
+  List: {};
 };
