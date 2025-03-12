@@ -14,10 +14,10 @@ type JsConfig = {
 
 export function buildConfig(jsConfig: JsConfig): Manifest {
   const output: Manifest = {};
+  output.contentTypes = [];
 
   if (jsConfig.contentTypes) {
     for (const key in jsConfig.contentTypes) {
-      output.contentTypes = [];
       const contentType = jsConfig.contentTypes[key];
 
       if (contentType) {
