@@ -21,7 +21,7 @@ export interface ContentType {
 }
 
 export type ContentTypeProperty = {
-  All: ContentTypeProperty["String"];
+  All: ContentTypeProperty["String"] | ContentTypeProperty["Content"];
   Base: {
     // This should be different for each Content Type. In the spec is just "string" for all
     // format?: string;
@@ -43,7 +43,11 @@ export type ContentTypeProperty = {
     type: "boolean";
   };
   Component: {};
-  Content: {};
+  Content: ContentTypeProperty["Base"] & {
+    type: "content";
+    allowedTypes?: string[];
+    restrictedTypes?: string[];
+  };
   ContentReference: {};
   DateTime: {};
   Float: {};
