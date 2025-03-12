@@ -52,7 +52,7 @@ export type ContentTypeProperty = {
     type: "string";
 
     // Not available in the schema:
-    format?: "string" | "shortString" | "html";
+    format?: "shortString" | "html";
     minLength?: number;
     maxLength?: number;
     enum?: {
