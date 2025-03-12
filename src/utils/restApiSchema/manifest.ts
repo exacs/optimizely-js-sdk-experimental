@@ -17,11 +17,13 @@ export interface ContentType {
     | "experience"
     | "section"
     | "element";
-  properties?: Record<string, ContentTypeProperty["All"]>;
+  properties?: Record<string, AllContentTypeProperties>;
 }
+export type AllContentTypeProperties =
+  | ContentTypeProperty["String"]
+  | ContentTypeProperty["Content"];
 
 export type ContentTypeProperty = {
-  All: ContentTypeProperty["String"] | ContentTypeProperty["Content"];
   Base: {
     // This should be different for each Content Type. In the spec is just "string" for all
     // format?: string;
