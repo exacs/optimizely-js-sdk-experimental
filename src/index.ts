@@ -1,5 +1,4 @@
 import type * as Json from "./utils/restApiSchema/manifest.js";
-import type { Manifest } from "./utils/restApiSchema/manifest.js";
 
 namespace Js {
   export namespace ContentTypes {
@@ -10,13 +9,13 @@ namespace Js {
   }
 
   export namespace ContentTypeProperties {
-    export type Content = Json.ContentTypeProperty["Base"] & {
+    export type Content = Json.ContentTypeProperties.Base & {
       type: "content";
       allowedTypes?: (Js.ContentTypes.All | string)[];
       restrictedTypes?: (Js.ContentTypes.All | string)[];
     };
 
-    export type All = Json.ContentTypeProperty["String"] | Content;
+    export type All = Json.ContentTypeProperties.String | Content;
   }
 }
 
@@ -27,7 +26,7 @@ type JsConfig = {
 function convertContentType(
   value: Js.ContentTypeProperties.All,
   allContentTypes: Record<string, Js.ContentTypes.All>
-): Json.AllContentTypeProperties {
+): Json.ContentTypeProperties.All {
   if (value.type !== "content") {
     return value;
   }
@@ -58,14 +57,14 @@ function convertContentType(
   };
 }
 
-export function buildConfig(jsConfig: JsConfig): Manifest {
-  const output: Manifest = {};
+export function buildConfig(jsConfig: JsConfig): Json.Manifest {
+  const output: Json.Manifest = {};
   output.contentTypes = [];
 
   if (jsConfig.contentTypes) {
     for (const key in jsConfig.contentTypes) {
       const { baseType, properties } = jsConfig.contentTypes[key];
-      const outputProperties: Record<string, Json.AllContentTypeProperties> =
+      const outputProperties: Record<string, Json.ContentTypeProperties.All> =
         {};
 
       for (const k in properties) {

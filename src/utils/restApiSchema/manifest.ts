@@ -17,14 +17,13 @@ export interface ContentType {
     | "experience"
     | "section"
     | "element";
-  properties?: Record<string, AllContentTypeProperties>;
+  properties?: Record<string, ContentTypeProperties.All>;
 }
-export type AllContentTypeProperties =
-  | ContentTypeProperty["String"]
-  | ContentTypeProperty["Content"];
 
-export type ContentTypeProperty = {
-  Base: {
+export namespace ContentTypeProperties {
+  export type All = String | Content;
+
+  export type Base = {
     // This should be different for each Content Type. In the spec is just "string" for all
     // format?: string;
     displayName?: string;
@@ -38,23 +37,23 @@ export type ContentTypeProperty = {
     editor?: string;
     editorSettings?: Record<string, Record<string, never>> | null;
   };
-  Binary: ContentTypeProperty["Base"] & {
+  export type Binary = Base & {
     type: "binary";
   };
-  Boolean: ContentTypeProperty["Base"] & {
+  export type Boolean = Base & {
     type: "boolean";
   };
-  Component: {};
-  Content: ContentTypeProperty["Base"] & {
+  export type Component = {};
+  export type Content = Base & {
     type: "content";
     allowedTypes?: string[];
     restrictedTypes?: string[];
   };
-  ContentReference: {};
-  DateTime: {};
-  Float: {};
-  Integer: {};
-  String: ContentTypeProperty["Base"] & {
+  export type ContentReference = {};
+  export type DateTime = {};
+  export type Float = {};
+  export type Integer = {};
+  export type String = Base & {
     type: "string";
 
     // Not available in the schema:
@@ -66,7 +65,7 @@ export type ContentTypeProperty = {
       values: { value: string; displayName: string }[];
     };
   };
-  Url: {};
-  JsonString: {};
-  List: {};
-};
+  export type Url = {};
+  export type JsonString = {};
+  export type List = {};
+}
