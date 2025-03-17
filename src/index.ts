@@ -1,6 +1,5 @@
 import type * as Json from "./utils/restApiSchema/manifest.js";
 
-/** TS types for ContentTypes and Properties as defined in the "JS config" */
 namespace Js {
   export namespace ContentTypes {
     export type All = Omit<Json.ContentType, "key" | "properties"> & {
@@ -9,15 +8,22 @@ namespace Js {
     };
   }
 
-  /** TS types for all "Content Type Properties in the CMS" */
   export namespace ContentTypeProperties {
+    export type All = Array | NonArray;
+    export type Array = {
+      type: "array";
+      items: NonArray;
+    };
+
+    // Note: ContentTypeProperties other than `Content` (e.g. String, ...)
+    // are defined in the Json manifest
+    export type NonArray = Json.ContentTypeProperties.String | Content;
+
     export type Content = Json.ContentTypeProperties.Base & {
       type: "content";
       allowedTypes?: (Js.ContentTypes.All | string)[];
       restrictedTypes?: (Js.ContentTypes.All | string)[];
     };
-
-    export type All = Json.ContentTypeProperties.String | Content;
   }
 }
 
@@ -55,10 +61,10 @@ const toStringMapper =
   };
 
 /** Converts a "JS" content type property to a "JSON" content type property */
-function convertContentTypeProperty(
-  value: Js.ContentTypeProperties.All,
+function convertContentType(
+  value: Js.ContentTypeProperties.NonArray,
   allContentTypes: Record<string, Js.ContentTypes.All>
-): Json.ContentTypeProperties.All {
+): Json.ContentTypeProperties.NonArray {
   if (value.type !== "content") {
     return value;
   }
@@ -83,10 +89,20 @@ export function buildConfig(jsConfig: JsConfig): Json.Manifest {
         {};
 
       for (const k in properties) {
-        outputProperties[k] = convertContentTypeProperty(
-          properties[k],
-          jsConfig.contentTypes
-        );
+        if (properties[k].type === "array") {
+          outputProperties[k] = {
+            type: "array",
+            items: convertContentType(
+              properties[k].items,
+              jsConfig.contentTypes
+            ),
+          };
+        } else {
+          outputProperties[k] = convertContentType(
+            properties[k],
+            jsConfig.contentTypes
+          );
+        }
       }
 
       output.contentTypes.push({

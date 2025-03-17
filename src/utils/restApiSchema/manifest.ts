@@ -21,8 +21,14 @@ export interface ContentType {
 }
 
 export namespace ContentTypeProperties {
-  export type All = String | Content;
+  export type All = Array | NonArray;
+  export type Array = {
+    type: "array";
+    items: NonArray;
+  };
+  export type NonArray = String | Content;
 
+  // `Base` includes all the common properties for all non-array ContentTypeProperties
   export type Base = {
     // This should be different for each Content Type. In the spec is just "string" for all
     // format?: string;
