@@ -1,5 +1,6 @@
 import type * as Json from "./utils/restApiSchema/manifest.js";
 
+/** TS types for ContentTypes and Properties as defined in the "JS config" */
 namespace Js {
   export namespace ContentTypes {
     export type All = Omit<Json.ContentType, "key" | "properties"> & {
@@ -8,6 +9,7 @@ namespace Js {
     };
   }
 
+  /** TS types for all "Content Type Properties in the CMS" */
   export namespace ContentTypeProperties {
     export type Content = Json.ContentTypeProperties.Base & {
       type: "content";
@@ -23,7 +25,37 @@ type JsConfig = {
   contentTypes?: Record<string, Js.ContentTypes.All>;
 };
 
-function convertContentType(
+/** Find `value` in a key:value `object` and return its key. Returns `undefined` if not found  */
+function findKey<T>(value: T, object: Record<string, T>) {
+  return Object.keys(object).find((k) => object[k] === value);
+}
+
+/**
+ * Given an `object` and a `value`, returns:
+ * - `value` if it's a string
+ * - the key in the object where its value is equal to `value`
+ */
+const toStringMapper =
+  <T>(object: Record<string, T>) =>
+  (value: T | string, index: number) => {
+    if (typeof value === "string") {
+      return value;
+    }
+
+    const key = findKey(value, object);
+
+    if (!key) {
+      // TODO: serialize
+      throw new Error(
+        `Wrong value ${index}. The element is not present in object`
+      );
+    }
+
+    return key;
+  };
+
+/** Converts a "JS" content type property to a "JSON" content type property */
+function convertContentTypeProperty(
   value: Js.ContentTypeProperties.All,
   allContentTypes: Record<string, Js.ContentTypes.All>
 ): Json.ContentTypeProperties.All {
@@ -31,29 +63,12 @@ function convertContentType(
     return value;
   }
 
-  const allowedTypes = value.allowedTypes?.map((t, index) => {
-    if (typeof t === "string") {
-      return t;
-    }
-
-    // Should be a reference to some "allContentTypes"
-    const foundKey = Object.keys(allContentTypes).find(
-      (k) => allContentTypes[k] === t
-    );
-
-    if (!foundKey) {
-      throw new Error(
-        `Wrong value ${index}: the referenced type is not included in the manifest`
-      );
-    }
-
-    return foundKey;
-  });
+  const { allowedTypes, restrictedTypes } = value;
 
   return {
     type: "content",
-    allowedTypes,
-    // restrictedTypes,
+    allowedTypes: allowedTypes?.map(toStringMapper(allContentTypes)),
+    restrictedTypes: restrictedTypes?.map(toStringMapper(allContentTypes)),
   };
 }
 
@@ -68,7 +83,7 @@ export function buildConfig(jsConfig: JsConfig): Json.Manifest {
         {};
 
       for (const k in properties) {
-        outputProperties[k] = convertContentType(
+        outputProperties[k] = convertContentTypeProperty(
           properties[k],
           jsConfig.contentTypes
         );
