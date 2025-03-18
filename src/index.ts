@@ -1,29 +1,49 @@
 import type * as Json from "./utils/restApiSchema/manifest.js";
 
-namespace Js {
+export namespace Js {
   export namespace ContentTypes {
     export type All = Omit<Json.ContentType, "key" | "properties"> & {
       baseType: NonNullable<Json.ContentType["baseType"]>;
       properties?: Record<string, Js.ContentTypeProperties.All>;
     };
+
+    export type Infer<T extends All> = T extends {
+      properties: Record<string, Js.ContentTypeProperties.All>;
+    }
+      ? {
+          [Key in keyof T["properties"]]: ContentTypeProperties.Infer<
+            T["properties"][Key]
+          >;
+        }
+      : 2;
   }
 
   export namespace ContentTypeProperties {
-    export type All = Array | NonArray;
-    export type Array = {
+    export type All = Array<NonArray> | NonArray;
+    export type Array<T extends NonArray> = {
       type: "array";
-      items: NonArray;
+      items: T;
     };
+
+    export type String = Json.ContentTypeProperties.String;
 
     // Note: ContentTypeProperties other than `Content` (e.g. String, ...)
     // are defined in the Json manifest
-    export type NonArray = Json.ContentTypeProperties.String | Content;
+    export type NonArray = String | Content;
 
     export type Content = Json.ContentTypeProperties.Base & {
       type: "content";
       allowedTypes?: (Js.ContentTypes.All | string)[];
       restrictedTypes?: (Js.ContentTypes.All | string)[];
     };
+
+    export type Infer<T extends All> = T extends String
+      ? string
+      : T extends Content
+      ? {}
+      : T extends Array<infer E>
+      ? Infer<E>[]
+      : "invalid";
   }
 }
 
@@ -117,6 +137,6 @@ export function buildConfig(jsConfig: JsConfig): Json.Manifest {
 }
 
 // Defines a content type
-export function buildContentType(js: Js.ContentTypes.All): Js.ContentTypes.All {
+export function buildContentType<T extends Js.ContentTypes.All>(js: T): T {
   return js;
 }
