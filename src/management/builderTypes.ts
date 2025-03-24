@@ -19,10 +19,7 @@ export type ContentTypeView = {};
 
 // List of all Content Types and their schema
 export namespace ContentTypes {
-  export type All = Omit<Json.ContentType, "properties"> & {
-    baseType: NonNullable<Json.ContentType["baseType"]>;
-    properties?: Record<string, ContentTypeProperties.All>;
-  };
+  export type All = Json.ContentType;
 
   export type Infer<T extends All> = T extends {
     properties: Record<string, ContentTypeProperties.All>;

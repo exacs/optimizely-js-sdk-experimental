@@ -4,20 +4,36 @@ export type Manifest = {
 };
 
 /** Content Type */
-export interface ContentType {
-  key: string;
-  displayName?: string;
-  baseType:
-    | "page"
-    | "component"
-    | "media"
-    | "image"
-    | "video"
-    | "folder"
-    | "experience"
-    | "section"
-    | "element";
-  properties?: Record<string, ContentTypeProperties.All>;
+export type ContentType = ContentTypes.All;
+
+export namespace ContentTypes {
+  export type All = Component | Experience | Others;
+
+  type Base = {
+    key: string;
+    displayName?: string;
+    properties?: Record<string, ContentTypeProperties.All>;
+  };
+
+  export type Component = Base & {
+    baseType: "component";
+    compositionBehaviors?: ("sectionEnabled" | "elementEnabled")[];
+  };
+
+  export type Experience = Base & {
+    baseType: "experience";
+  };
+
+  export type Others = Base & {
+    baseType:
+      | "page"
+      | "media"
+      | "image"
+      | "video"
+      | "folder"
+      // | "section" -- not allowed
+      | "element";
+  };
 }
 
 /** All possible Content Type Properties */
