@@ -1,4 +1,3 @@
-import chalk from "chalk";
 import { resolve } from "node:path";
 import { glob } from "glob";
 import { tsImport } from "tsx/esm/api";

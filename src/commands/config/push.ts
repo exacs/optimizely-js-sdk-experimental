@@ -1,6 +1,6 @@
 import { Args, Flags } from "@oclif/core";
 import type * as Js from "../../management/builderTypes.js";
-import { resolve } from "node:path";
+import path from "node:path";
 import { createRestApiClientFromCredentials } from "../../utils/restApiClient.js";
 import ora from "ora";
 import { BaseCommand } from "../../baseCommand.js";
@@ -24,7 +24,7 @@ export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
 
   public async run(): Promise<void> {
     const { args, flags } = await this.parse(ConfigPush);
-    const configPath = resolve(process.cwd(), args.file);
+    const configPath = path.resolve(process.cwd(), args.file);
 
     const jsConfig = await import(configPath).then(
       // Assume that the default import _is_ a jsConfig
@@ -33,9 +33,10 @@ export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
 
     if (typeof jsConfig.contentTypes === "string") {
       // Note: the pattern is relative to the config file
+      const configPathDirectory = path.dirname(configPath);
       const contentTypes = await findContentTypes(
         jsConfig.contentTypes,
-        configPath
+        configPathDirectory
       );
 
       for (const ct of contentTypes) {
