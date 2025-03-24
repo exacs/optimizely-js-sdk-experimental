@@ -8,6 +8,10 @@ export type FoundContentType = {
   contentType: Js.ContentType;
 };
 
+function isContentType(obj: unknown): obj is Js.ContentType {
+  return typeof obj === "object" && obj !== null && "key" in obj;
+}
+
 /** Finds a list of content types in a given glob */
 export async function findContentTypes(
   pattern: string,
@@ -19,12 +23,15 @@ export async function findContentTypes(
   for (const f of files) {
     const loaded = await tsImport(resolve(f), cwd);
 
-    if (loaded.default.optimizelyContentType) {
-      const contentType = loaded.default.optimizelyContentType;
-      found.push({
-        path: f,
-        contentType,
-      });
+    // Traverse every exported object
+    for (const k in loaded) {
+      const obj = loaded[k];
+      if (isContentType(obj)) {
+        found.push({
+          path: f,
+          contentType: obj,
+        });
+      }
     }
   }
 
