@@ -29,5 +29,9 @@ export function OptimizelyComponent({ opti }: Props) {
 
   const Component = importer(contentType);
 
+  if (!Component) {
+    return <div>No component found for content type {contentType}</div>;
+  }
+
   return <Component opti={opti} />;
 }
