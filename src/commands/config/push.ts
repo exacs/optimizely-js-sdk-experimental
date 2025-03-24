@@ -54,8 +54,6 @@ export default class ConfigPush extends BaseCommand<typeof ConfigPush> {
 
     const restClient = await createRestApiClientFromCredentials(flags.host);
 
-    console.log(jsConfig);
-
     if (flags.output) {
       await writeFile(flags.output, JSON.stringify(jsConfig, null, 2));
       console.log(`Configuration file written in '${flags.output}'`);
