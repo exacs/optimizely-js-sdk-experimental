@@ -52,7 +52,7 @@ export async function createRestApiClient({
 }
 
 export async function createRestApiClientFromCredentials(host?: string) {
-  const cred = readCredentials(host);
+  const cred = readCredentials(host ?? process.env.OPTIMIZELY_HOST);
 
   if (!cred) {
     throw new credentialErrors.NoCredentialsFound();

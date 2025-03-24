@@ -80,5 +80,5 @@ export function readCredentials(url?: string) {
     };
   }
 
-  throw new Error();
+  return null;
 }
