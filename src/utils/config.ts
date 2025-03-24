@@ -67,7 +67,9 @@ export function readCredentials(url?: string) {
   }
 
   if (!url && Object.values(obj.data).length > 1) {
-    throw new Error();
+    throw new Error(
+      "More than one credentials detected. Provide the --host flag or the OPTIMIZELY_HOST env var"
+    );
   }
 
   const normalizedUrl = new URL("/", url).toString();
