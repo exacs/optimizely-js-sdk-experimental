@@ -56,10 +56,15 @@ export default class DangerDeleteAllContentTypes extends BaseCommand<
 
     for (const type of deletedTypes) {
       const spinner = ora(`Deleting ${type.key}...`);
-      await client.DELETE("/contenttypes/{key}", {
+      const r = await client.DELETE("/contenttypes/{key}", {
         params: { path: { key: type.key } },
       });
-      spinner.succeed(`'${type.key}' deleted`);
+
+      if (!r.response.ok) {
+        spinner.fail(`'${type.key}' cannot be deleted`);
+      } else {
+        spinner.succeed(`'${type.key}' deleted`);
+      }
     }
   }
 }
