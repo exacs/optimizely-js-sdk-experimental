@@ -20,8 +20,17 @@ export type ContentTypeView = {};
 
 // List of all Content Types and their schema
 export namespace ContentTypes {
-  export type All = Json.ContentType;
-  export type Experience = Json.ContentTypes.Experience;
+  export type All =
+    | Json.ContentTypes.Component
+    | Experience
+    | Json.ContentTypes.Others;
+
+  export type Experience = Json.ContentTypes.Experience & {
+    defaultView?: {
+      sections?: string[];
+      elements?: string[];
+    };
+  };
 
   export type Infer<T extends All> = Prettify<
     InferProps<T> & InferExperienceProps<T>
@@ -39,7 +48,11 @@ export namespace ContentTypes {
   export type InferExperienceProps<T extends All> = T extends Experience
     ? {
         composition: {
-          nodes: any[];
+          nodes: {
+            component?: {
+              __typename: string;
+            };
+          }[];
         };
       }
     : {};
