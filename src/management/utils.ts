@@ -3,6 +3,10 @@ import { glob } from "glob";
 import { tsImport } from "tsx/esm/api";
 import type * as Js from "./builderTypes.js";
 
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
 export type FoundContentType = {
   path: string;
   contentType: Js.ContentType;

@@ -5,6 +5,7 @@
  */
 
 import * as Json from "./manifestTypes.js";
+import { Prettify } from "./utils.js";
 
 /** Argument for `buildConfig` */
 export type Config = {
@@ -20,8 +21,12 @@ export type ContentTypeView = {};
 // List of all Content Types and their schema
 export namespace ContentTypes {
   export type All = Json.ContentType;
+  export type Experience = Json.ContentTypes.Experience;
 
-  export type Infer<T extends All> = T extends {
+  export type Infer<T extends All> = Prettify<
+    InferProps<T> & InferExperienceProps<T>
+  >;
+  export type InferProps<T extends All> = T extends {
     properties: Record<string, ContentTypeProperties.All>;
   }
     ? {
@@ -30,6 +35,14 @@ export namespace ContentTypes {
         >;
       }
     : 2;
+
+  export type InferExperienceProps<T extends All> = T extends Experience
+    ? {
+        composition: {
+          nodes: any[];
+        };
+      }
+    : {};
 }
 
 export namespace ContentTypeProperties {
