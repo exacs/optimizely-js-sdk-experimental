@@ -41,13 +41,15 @@ async function expandField(
   };
 }
 /** Returns a fragment for a content type */
-async function getFragment(contentTypeName: string, importer: Importer) {
+async function getFragment(viewName: string, importer: Importer) {
   const fields: string[] = [];
   const fragments: string[] = [];
 
-  const { properties } = await importer(contentTypeName).then(
+  const contentType = await importer(viewName).then(
     (m) => m.default.optimizelyContentType
   );
+
+  const properties = contentType.properties;
 
   for (const propertyKey in properties) {
     const property = properties[propertyKey];
@@ -61,10 +63,23 @@ async function getFragment(contentTypeName: string, importer: Importer) {
     fragments.push(...extraFragments);
   }
 
-  // 3. Concatenate all fragments and the properties
-  fragments.push(
-    `fragment ${contentTypeName} on ${contentTypeName} {${fields.join(" ")}}`
-  );
+  if (contentType.baseType === "experience") {
+    if (contentType.defaultView?.sections) {
+      let field =
+        "composition { nodes { ... on CompositionComponentNode { component {";
+      field += "__typename ";
+
+      for (const section of contentType.defaultView.sections) {
+        field += "..." + section;
+        const subfragment = await getFragment(section, importer);
+        fragments.push(subfragment);
+      }
+      field += "}}}}";
+      fields.push(field);
+    }
+  }
+
+  fragments.push(`fragment ${viewName} on ${viewName} {${fields.join(" ")}}`);
 
   return fragments.join("\n");
 }
@@ -94,7 +109,7 @@ export async function getByPath(
   const data = await graffle.gql(q1).send({ url: path });
   const content = data?._Content.item;
   const contentTypeName = content._metadata.types[0];
-  const id = content._id;
+  const id = content._metadata.key;
   const fragment = await getFragment(contentTypeName, importer);
 
   const q2 = `
@@ -107,9 +122,6 @@ export async function getByPath(
       }
     }
   }`;
-
-  console.log("---- QUERY -----");
-  console.log(q2);
 
   const data2 = await graffle.gql(q2).send({ id });
   return data2?._Content.item;
