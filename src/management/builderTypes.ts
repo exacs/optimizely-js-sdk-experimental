@@ -33,7 +33,7 @@ export namespace ContentTypes {
   };
 
   export type Infer<T extends All> = Prettify<
-    InferProps<T> & InferExperienceProps<T>
+    InferBaseProps & InferProps<T> & InferExperienceProps<T>
   >;
   export type InferProps<T extends All> = T extends {
     properties: Record<string, ContentTypeProperties.All>;
@@ -43,7 +43,15 @@ export namespace ContentTypes {
           T["properties"][Key]
         >;
       }
-    : 2;
+    : {};
+
+  export type InferBaseProps = {
+    _metadata: {
+      url: {
+        default: string;
+      };
+    };
+  };
 
   export type InferExperienceProps<T extends All> = T extends Experience
     ? {

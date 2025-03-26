@@ -23,7 +23,7 @@ export function OptimizelyWrapper(props: {
   );
 }
 
-export function OptimizelyComponent({ opti }: Props) {
+export function OptimizelyComponent({ opti, ...props }: Props) {
   const contentType = opti.__typename;
   const importer = useContext(OptiCtx);
 
@@ -33,5 +33,5 @@ export function OptimizelyComponent({ opti }: Props) {
     return <div>No component found for content type {contentType}</div>;
   }
 
-  return <Component opti={opti} />;
+  return <Component opti={opti} {...props} />;
 }
