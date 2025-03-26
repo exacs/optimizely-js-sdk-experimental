@@ -51,6 +51,8 @@ async function getFragment(viewName: string, importer: Importer) {
 
   const properties = contentType.properties;
 
+  fields.push("_metadata { url { default } }");
+
   for (const propertyKey in properties) {
     const property = properties[propertyKey];
     const { field, extraFragments } = await expandField(
@@ -106,7 +108,13 @@ export async function getByPath(
     }
   }`;
 
+  console.log("---- QUERY 1");
+  console.log(q1);
+  console.log("-----");
+
   const data = await graffle.gql(q1).send({ url: path });
+
+  console.log(JSON.stringify(data, null, 2));
   const content = data?._Content.item;
   const contentTypeName = content._metadata.types[0];
   const id = content._metadata.key;
@@ -122,7 +130,12 @@ export async function getByPath(
       }
     }
   }`;
+  console.log("---- QUERY 2");
+  console.log(q2);
 
   const data2 = await graffle.gql(q2).send({ id });
+
+  console.log("----");
+  console.log(JSON.stringify(data2, null, 2));
   return data2?._Content.item;
 }
